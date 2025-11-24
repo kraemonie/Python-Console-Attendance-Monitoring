@@ -2,6 +2,8 @@ import datetime
 import csv
 import os
 
+# Stores accounts in memory
+# Format:
 # username : { "password": ..., "student_id": ... }
 ACCOUNTS = {
     "admin": {
@@ -16,13 +18,13 @@ ATTENDANCE_FILE = 'attendance_log.csv'
 def register_account():
     print("\n--- Register New Account ---")
 
-    username = input("Enter new username: ")
+    username = input("Enter new username: ").strip()
     if username in ACCOUNTS:
         print("Username already exists!\n")
         return
 
-    password = input("Enter new password: ")
-    student_id = input("Enter student name / student ID: ")
+    password = input("Enter new password: ").strip()
+    student_id = input("Enter student name / student ID: ").strip()
 
     ACCOUNTS[username] = {
         "password": password,
@@ -51,12 +53,12 @@ def log_attendance(student_id):
 
 def login():
     print("\n--- LOGIN ---")
-    username = input("Enter username: ")
-    password = input("Enter password: ")
+    username = input("Enter username: ").strip()
+    password = input("Enter password: ").strip()
 
     if username in ACCOUNTS and ACCOUNTS[username]["password"] == password:
         print("Login successful!\n")
-        return username 
+        return username  # Return username instead of student_id
     else:
         print("Invalid username or password.\n")
         return None
@@ -107,7 +109,7 @@ def admin_menu():
         print("3 - Clear attendance log")
         print("4 - Register new account")
         print("5 - Logout")
-        admin_choice = input("Choose an option: ")
+        admin_choice = input("Choose an option: ").strip()
 
         if admin_choice == "1":
             view_accounts()
@@ -133,7 +135,7 @@ def main():
         print("2 - View attendance list")
         print("3 - Quit")
 
-        user_action = input("Choose an option (1/2/3): ")
+        user_action = input("Choose an option (1/2/3): ").strip()
 
         if user_action == "1":
             username = login()
