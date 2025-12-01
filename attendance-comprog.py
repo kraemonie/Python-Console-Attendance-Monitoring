@@ -111,38 +111,61 @@ def log_attendance(student_id):
 def view_attendance():
     print("\n--- Attendance Records ---")
 
-    found = False
+    records = []
 
+    # Add unsaved in-memory logs
     for entry in ATTENDANCE_DATA:
-        print(entry)
-        found = True
+        records.append(entry)
 
-    # Show saved logs
+    # Add saved logs from file
     if os.path.isfile(ATTENDANCE_FILE):
         with open(ATTENDANCE_FILE, 'r') as file:
             for line in file:
                 line = line.strip()
                 if line.startswith("User ID:"):
-                    print(line)
-                    found = True
+                    records.append(line)
 
-    if not found:
+    # Remove duplicates
+    records = list(dict.fromkeys(records))
+
+    if not records:
         print("No attendance records found.\n")
+        return
+    
+    def extract_datetime(record):
+        try:
+            # Extract the actual datetime from the text
+            time_part = record.split("Time: ")[1]
+            return datetime.datetime.strptime(time_part, "%b %d, %Y - %I:%M %p")
+        except:
+            return datetime.datetime.min  # fallback if parsing fails
+
+    records.sort(key=extract_datetime)
+
+    for r in records:
+        print(r)
 
     print()
 
+
 def save_file():
-    # If file doesn't exist, write header first
-    file_exists = os.path.isfile(ATTENDANCE_FILE)
+    #today = datetime.date.today().strftime("%b %d, %Y")
+
+    write_header = not os.path.isfile(ATTENDANCE_FILE) or os.path.getsize(ATTENDANCE_FILE) == 0
+
     with open(ATTENDANCE_FILE, 'w') as file:
-        file.write("Saved Attendance Records:\n")
-        if not file_exists:
-            file.write(f"Attendance for {today}\n")
+        file.write("Attendance Log:\n\n")
+
+        #if write_header:
+            #file.write(f"Saved attendance records on {today}:\n")
 
         for entry in ATTENDANCE_DATA:
-            file.write(entry.strip() + "\n")
+            file.write(entry + "\n")
 
-    ATTENDANCE_DATA.clear()
+    print(f"\nAttendance log saved to {ATTENDANCE_FILE}.\n")
+    #ATTENDANCE_DATA.clear()
+
+
 
 def clear_attendance():
     open(ATTENDANCE_FILE, 'w').close()
@@ -179,8 +202,6 @@ def login():
 
     print("\nInvalid username or password.\n")
     return None
-
-save_file()
 
 
 def view_accounts():
